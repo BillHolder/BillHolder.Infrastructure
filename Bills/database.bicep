@@ -1,5 +1,6 @@
 param cosmosDbAccountName string
 param location string = resourceGroup().location
+param env string
 
 @description('The name for the SQL API database')
 param databaseName string
@@ -8,7 +9,7 @@ param databaseName string
 param containerName string
 
 resource account 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' = {
-  name: toLower(cosmosDbAccountName)
+  name: '${toLower(cosmosDbAccountName)}${env}'
   location: location
   properties: {
     enableFreeTier: true
@@ -26,10 +27,10 @@ resource account 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' = {
 
 resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15' = {
   parent: account
-  name: databaseName
+  name: '${databaseName}${env}'
   properties: {
     resource: {
-      id: databaseName
+      id: '${databaseName}${env}'
     }
     options: {
       throughput: 1000
@@ -39,10 +40,10 @@ resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15
 
 resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2022-05-15' = {
   parent: database
-  name: containerName
+  name: '${containerName}${env}'
   properties: {
     resource: {
-      id: containerName
+      id: '${containerName}${env}'
       partitionKey: {
         paths: [
           '/myPartitionKey'
